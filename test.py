@@ -88,17 +88,13 @@ if __name__ == '__main__':
         'none',
     ]
     CURRENT_PATH = os.path.dirname(__file__)
-    BEST_WEIGHT_NAME = f'epoch_10_trainLoss_0.5162_trainAcc_87.22_valLoss_0.5543_valAcc_87.4.pth'
-    TMP_ROOT = f'model_weight/model_resnet101'
+    BEST_WEIGHT_NAME = f'epoch_14_trainLoss_0.1482_trainAcc_98.44_valLoss_0.4114_valAcc_89.52.pth'
+    TMP_ROOT = f'model_weight/model_mobilenet_v3_small'
     SAVE_MODELS_PATH = f'{CURRENT_PATH}/{TMP_ROOT}/{BEST_WEIGHT_NAME}'
-    #resnet 最後一層叫fc   densenet叫classifier
-    model = torchvision.models.resnet101()
-    num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 16)
+    model = model_mobilenet_v3_small(num_classes=16)
     model.load_state_dict(torch.load(SAVE_MODELS_PATH))
     #print(model)
     print('Loading Weight:',BEST_WEIGHT_NAME)
-
     NEURAL_NETWORK = model.to(device) 
 
     
