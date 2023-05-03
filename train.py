@@ -141,18 +141,20 @@ def plot_statistics(train_loss,
     '''
     統計train、valid的loss、acc
     '''
-    
-    t_loss = plt.plot(train_loss)
-    t_acc = plt.plot(train_acc)
-    v_loss = plt.plot(valid_loss)
-    v_acc = plt.plot(valid_acc)
-    plt.legend([t_loss,t_acc,v_loss,v_acc],
-               labels=['train_loss',
-                        'train_acc',
-                        'valid_loss',
-                        'valid_acc'])
+    fig, ax = plt.subplots()
+    epcoh = [x for x in range(len(train_loss))]
+    ax2 = ax.twinx()
+    t_loss = ax.plot(train_loss,color='green',label='train_loss')
+    v_loss = ax.plot(valid_loss,color='red',label='valid_loss')
+    t_acc = ax2.plot(train_acc,color='#00FF55',label='train_acc')
+    v_acc = ax2.plot(valid_acc,color='#FF5500',label='valid_acc')
+    ax.set_xlabel("epoch")
+    ax.set_ylabel("loss")
+    ax2.set_ylabel("acc")
+    ax.legend(loc='upper left')
+    ax2.legend(loc='upper right')
     plt.savefig(f'{SAVE_MODELS_PATH}/train_statistics',bbox_inches='tight')
-    #plt.show()
+    plt.figure()
     
 class SquarePad:
 	'''
@@ -168,21 +170,28 @@ class SquarePad:
 
 
 if __name__ == '__main__':
+    '''
+    修改model train:
+    model都有import在上面
+    SAVE_MODELS_PATH 將後面的檔案名稱換成要load model的名稱 ex:model_resnet101、model_densenet121
 
+    '''
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     print('GPU state:',device)
     
     CURRENT_PATH = os.path.dirname(__file__)
-    NEURAL_NETWORK = model_resnet101(num_classes=16).to(device)
+    NEURAL_NETWORK = model_resnet101(num_classes=16).to(device)      #讀不同的model
     #print(summary(NEURAL_NETWORK, input_size=(3,224,224)))
     SHUFFLE_DATASET = True
     BATCH_SIZE=32
-    SAVE_MODELS_PATH = f'{CURRENT_PATH}/model_weight/model_resnet101'
+    SAVE_MODELS_PATH = f'{CURRENT_PATH}/model_weight/model_resnet101' #記得改這行的model_resnet101
+    
     try:
         shutil.rmtree(SAVE_MODELS_PATH)
     except:
         pass
     os.makedirs(SAVE_MODELS_PATH)
+
     LEARNING_RATE = 0.001 #lambda x: ((1.001 + math.cos(x * math.pi / EPOCH))) #* (1 - 0.1) + 0.1  # cosine
     EPOCH = 1000
     
@@ -193,7 +202,7 @@ if __name__ == '__main__':
     EARLY_STOP = early_stop(save_path=SAVE_MODELS_PATH,
                             mode='max',
                             monitor='val_acc',
-                            patience=10)
+                            patience=5)
     
     train_transform = transforms.Compose([
         SquarePad(),
