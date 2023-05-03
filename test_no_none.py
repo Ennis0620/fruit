@@ -39,15 +39,16 @@ def test(test_loader,
             out = torch.softmax(out,dim=1)
             testid_p = out.argmax(dim=1)   
 
-            '''
+            
             for idx,per_img_pred in enumerate(out):
-                print('ori:',testid_p[idx])
-                if torch.max(per_img_pred).detach().cpu().numpy() < 0.3:
+                #print('ori:',testid_p[idx])
+                if torch.max(per_img_pred).detach().cpu().numpy() < 0.5:
                     t = torch.tensor([[15]])#其他類別
                     testid_p[idx] = torch.tensor(15)
-                    print('change:',testid_p[idx])
-            print(testid_p)
-            '''
+                    label[idx] = torch.tensor(15)
+                    #print('change:',testid_p[idx])
+
+            #print(testid_p)
             
                 #if torch.max(out).detach().cpu().numpy() < 0.3: #預測出來最大機率<0.3
                 #    print()
@@ -105,10 +106,10 @@ if __name__ == '__main__':
         'none',
     ]
     CURRENT_PATH = os.path.dirname(__file__)
-    BEST_WEIGHT_NAME = f'epoch_16_trainLoss_0.1741_trainAcc_96.88_valLoss_0.2196_valAcc_95.77.pth'
-    TMP_ROOT = f'model_weight/model_efficientnet_v2_l'
+    BEST_WEIGHT_NAME = f'epoch_8_trainLoss_0.2483_trainAcc_96.15_valLoss_0.2337_valAcc_100.0.pth'
+    TMP_ROOT = f'model_weight/model_efficientnet_v2_l_no_none'
     SAVE_MODELS_PATH = f'{CURRENT_PATH}/{TMP_ROOT}/{BEST_WEIGHT_NAME}'
-    model = model_efficientnet_v2_l(num_classes=16)
+    model = model_efficientnet_v2_l(num_classes=15)
     model.load_state_dict(torch.load(SAVE_MODELS_PATH))
     #print(model)
     print('Loading Weight:',BEST_WEIGHT_NAME)

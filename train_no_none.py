@@ -59,6 +59,7 @@ def train(train_loader,
             train_avg_loss += loss.item()
             
             #計算acc
+            out = torch.softmax(out,dim=1)
             train_p = out.argmax(dim=1)                 #取得預測的最大值
             num_correct = (train_p==label).sum().item() #該batch在train時預測成功的數量
             batch_acc  = num_correct / label.size(0)
@@ -180,11 +181,11 @@ if __name__ == '__main__':
     print('GPU state:',device)
     
     CURRENT_PATH = os.path.dirname(__file__)
-    NEURAL_NETWORK = model_efficientnet_v2_l(num_classes=16).to(device)      #讀不同的model
+    NEURAL_NETWORK = model_efficientnet_v2_l(num_classes=15).to(device)      #讀不同的model
     #print(summary(NEURAL_NETWORK, input_size=(3,224,224)))
     SHUFFLE_DATASET = True
     BATCH_SIZE=32
-    SAVE_MODELS_PATH = f'{CURRENT_PATH}/model_weight/model_efficientnet_v2_l' #記得改這行的model_resnet101
+    SAVE_MODELS_PATH = f'{CURRENT_PATH}/model_weight/model_efficientnet_v2_l_no_none' #記得改這行的model_resnet101
     
     try:
         shutil.rmtree(SAVE_MODELS_PATH)
@@ -202,7 +203,7 @@ if __name__ == '__main__':
     EARLY_STOP = early_stop(save_path=SAVE_MODELS_PATH,
                             mode='max',
                             monitor='val_acc',
-                            patience=5)
+                            patience=7)
     
     train_transform = transforms.Compose([
         SquarePad(),
@@ -229,12 +230,12 @@ if __name__ == '__main__':
     ])
     # training dataset
     train_dataset = datasets.ImageFolder(
-        root=f'{CURRENT_PATH}/data/fruit/train',
+        root=f'{CURRENT_PATH}/data/fruit/train_no_none',
         transform=train_transform
     )
     # validation dataset
     valid_dataset = datasets.ImageFolder(
-        root=f'{CURRENT_PATH}/data/fruit/valid',
+        root=f'{CURRENT_PATH}/data/fruit/valid_no_none',
         transform=valid_transform
     )
     # training data loaders
